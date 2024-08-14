@@ -16,7 +16,7 @@ spec:
         app: roar-web
     spec:
       containers:
-      - image: localhost:5000/roar-web-v1
+      - image: localhost:5000/roar-web:v1
         imagePullPolicy: Always
         name: roar-web
         ports:
@@ -59,15 +59,27 @@ spec:
     spec:
       containers:
       - env:
-        - name: MYSQL_DATABASE
-          value: registry
-        - name: MYSQL_PASSWORD
-          value: admin
-        - name: MYSQL_ROOT_PASSWORD
-          value: root+1
-        - name: MYSQL_USER
-          value: admin
-        image: localhost:5000/roar-db-v1
+          - name: MYSQL_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: mysql-configmap
+                key: mysql.database
+          - name: MYSQL_PASSWORD
+            valueFrom: 
+              secretKeyRef:
+                name: mysqlsecret
+                key: mysqlpassword
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysqlsecret
+                key: mysqlrootpassword
+          - name: MYSQL_USER
+            valueFrom:
+              configMapKeyRef:
+                name: mysql-configmap
+                key: mysql.user
+        image: localhost:5000/roar-db:v1
         imagePullPolicy: Always
         name: mysql
         ports:
